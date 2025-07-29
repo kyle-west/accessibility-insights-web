@@ -79,7 +79,7 @@ const automatedChecksColumns: InstanceTableColumn[] = [
 ];
 
 function getInstanceStatus(result: DecoratedAxeNodeResult): ManualTestStatus {
-    const { status } = axeCheckOverrides(result);
+    const { status } = axeCheckOverrides(result); // @MODIFIED
     if (status === true) {
         return ManualTestStatus.PASS;
     } else {
