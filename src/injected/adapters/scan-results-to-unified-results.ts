@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+import { axeCheckOverrides } from '_mods/axe-rules';
 import { TargetHelper } from 'common/target-helper';
 import { RelatedSelectorExtractor } from 'injected/adapters/extract-related-selectors';
 import { ResolutionCreator } from 'injected/adapters/resolution-creator';
@@ -115,9 +116,27 @@ export class ConvertScanResultsToUnifiedResults {
         getResolution: ResolutionCreator,
     ): UnifiedResult => {
         const cssSelector = TargetHelper.getSelectorFromTarget(nodeResult.target);
+
+        // @MODIFIED start
+        // Apply axe check overrides to potentially modify the status
+        const { status: overriddenStatus } = axeCheckOverrides({
+            status: ruleResultData.status === 'fail',
+            ruleId: ruleResultData.ruleID,
+            selector: cssSelector,
+            html: nodeResult.html,
+            failureSummary: nodeResult.failureSummary,
+            any: nodeResult.any,
+            none: nodeResult.none,
+            all: nodeResult.all,
+        });
+
+        // Convert boolean override result back to InstanceResultStatus
+        const finalStatus = overriddenStatus === true ? 'pass' : ruleResultData.status;
+        // @MODIFIED end
+
         return {
             uid: this.uuidGenerator(),
-            status: ruleResultData.status,
+            status: finalStatus, // @MODIFIED
             ruleId: ruleResultData.ruleID,
             identifiers: {
                 identifier: cssSelector,
