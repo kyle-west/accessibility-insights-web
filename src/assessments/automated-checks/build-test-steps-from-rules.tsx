@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+import { axeCheckOverrides } from '_mods/axe-rules';
 import {
     onRenderPathColumn,
     onRenderSnippetColumn,
@@ -78,7 +79,8 @@ const automatedChecksColumns: InstanceTableColumn[] = [
 ];
 
 function getInstanceStatus(result: DecoratedAxeNodeResult): ManualTestStatus {
-    if (result.status === true) {
+    const { status } = axeCheckOverrides(result);
+    if (status === true) {
         return ManualTestStatus.PASS;
     } else {
         return ManualTestStatus.FAIL;
